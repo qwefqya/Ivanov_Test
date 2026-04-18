@@ -19,6 +19,17 @@ public class ItemPickupController : MonoBehaviour
     public bool HasHeldItem => CurrentHeldItem != null;
     public bool IsInspecting => CurrentInspectingItem != null;
 
+    public bool IsHoldingItemKind(ItemKind kind)
+    {
+        if (CurrentHeldItem == null)
+            return false;
+
+        if (CurrentHeldItem.Definition == null)
+            return false;
+
+        return CurrentHeldItem.Definition.itemKind == kind;
+    }
+
     public void TryInteractWithItem(ItemInteractable item)
     {
         if (item == null)
@@ -140,16 +151,7 @@ public class ItemPickupController : MonoBehaviour
             playerLook.enabled = enabled;
     }
 
-    public bool IsHoldingItemKind(ItemKind kind)
-    {
-        if (CurrentHeldItem == null)
-            return false;
-
-        if (CurrentHeldItem.Definition == null)
-            return false;
-
-        return CurrentHeldItem.Definition.itemKind == kind;
-    }
+ 
 
     public bool ConsumeHeldItemIfMatches(ItemKind kind)
     {

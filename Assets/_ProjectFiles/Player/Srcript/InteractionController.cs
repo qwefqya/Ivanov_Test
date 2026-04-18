@@ -8,6 +8,7 @@ public class InteractionController : MonoBehaviour
     [SerializeField] private PlayerInputReader inputReader;
     [SerializeField] private InteractionPromptView promptView;
     [SerializeField] private ItemPickupController itemPickupController;
+    [SerializeField] private HackSequenceController hackSequenceController;
 
     private IInteractable currentInteractable;
     private IInteractable activeInteractable;
@@ -17,6 +18,12 @@ public class InteractionController : MonoBehaviour
 
     private void Update()
     {
+        if (hackSequenceController != null && hackSequenceController.IsHacking)
+            return;
+
+        UpdateCurrentInteractable();
+        ProcessInteraction();
+        UpdatePrompt();
         UpdateCurrentInteractable();
         ProcessInteraction();
         UpdatePrompt();
