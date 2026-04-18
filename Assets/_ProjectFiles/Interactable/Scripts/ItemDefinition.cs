@@ -12,7 +12,9 @@ public enum ItemState
     InSocket,
     InWorld,
     Inspecting,
-    Held
+    Held,
+    Consumed
+
 }
 
 [CreateAssetMenu(menuName = "Game/Item Definition")]

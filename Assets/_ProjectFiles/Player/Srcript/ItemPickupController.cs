@@ -44,10 +44,19 @@ public class ItemPickupController : MonoBehaviour
         CurrentInspectingItem = item;
         item.SetState(ItemState.Inspecting);
 
+        // Если предмет лежал в сокете — очищаем сокет
+        if (item.HomeSocket != null && item.HomeSocket.CurrentItem == item)
+        {
+            item.HomeSocket.ClearItem();
+        }
+
+        // Во время осмотра коллайдер выключаем, чтобы он не мешал raycast
+        item.SetColliderEnabled(false);
+
         AttachToPoint(item.transform, inspectAnchor);
 
-        SetPlayerControl(false);
         inspectView.Show(item.Definition.description);
+        SetPlayerControl(false);
     }
 
     private void ConfirmPickup(ItemInteractable item)
@@ -57,15 +66,52 @@ public class ItemPickupController : MonoBehaviour
 
         item.SetState(ItemState.Held);
 
+        // В руке коллайдер тоже выключен, чтобы не перекрывать сокеты
+        item.SetColliderEnabled(false);
+
         AttachToPoint(item.transform, heldItemAnchor);
 
         inspectView.Hide();
         SetPlayerControl(true);
     }
 
+    public bool CanPlaceIntoSocket(ItemSocket socket)
+    {
+        if (CurrentHeldItem == null)
+            return false;
+
+        if (socket == null)
+            return false;
+
+        return true;
+    }
+
+    public void TryPlaceHeldItemIntoSocket(ItemSocket socket)
+    {
+        if (!CanPlaceIntoSocket(socket))
+            return;
+
+        PlaceHeldItem(socket);
+    }
+
+    private void PlaceHeldItem(ItemSocket socket)
+    {
+        ItemInteractable item = CurrentHeldItem;
+
+        CurrentHeldItem = null;
+
+        item.SetState(ItemState.InSocket);
+        socket.SetItem(item);
+
+        // Когда предмет снова в мире/сокете — включаем коллайдер обратно
+        item.SetColliderEnabled(true);
+
+        AttachToPoint(item.transform, socket.ItemPoint);
+    }
+
     private void AttachToPoint(Transform itemTransform, Transform targetPoint)
     {
-        itemTransform.SetParent(targetPoint);
+        itemTransform.SetParent(targetPoint, false);
         itemTransform.localPosition = Vector3.zero;
         itemTransform.localRotation = Quaternion.identity;
     }

@@ -7,11 +7,10 @@ public class InteractionController : MonoBehaviour
     [SerializeField] private LayerMask interactionLayer;
     [SerializeField] private PlayerInputReader inputReader;
     [SerializeField] private InteractionPromptView promptView;
+    [SerializeField] private ItemPickupController itemPickupController;
 
     private IInteractable currentInteractable;
     private IInteractable activeInteractable;
-
-    //нужно чтобы активность не сбивалась при отводе взгляда
 
     private bool isInteracting;
     private float holdTime;
@@ -32,24 +31,36 @@ public class InteractionController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionLayer))
         {
             currentInteractable = hit.collider.GetComponent<IInteractable>();
-            // проверяем на наличие интрфейса Interactctable
+
             if (currentInteractable == null)
                 currentInteractable = hit.collider.GetComponentInParent<IInteractable>();
-            //проверка наличия интрфейса у родителя
         }
     }
 
     private void ProcessInteraction()
     {
-        if (inputReader.InteractStartedThisFrame && currentInteractable != null)  // проверяем что смотрим на interactable и зажали E(action)
+        IInteractable target = null;
+
+        // Если сейчас идёт осмотр предмета, второй E должен работать
+        // не через raycast, а через текущий предмет в осмотре
+        if (itemPickupController != null && itemPickupController.IsInspecting)
         {
-            activeInteractable = currentInteractable;
+            target = itemPickupController.CurrentInspectingItem;
+        }
+        else
+        {
+            target = currentInteractable;
+        }
+
+        if (inputReader.InteractStartedThisFrame && target != null)
+        {
+            activeInteractable = target;
             isInteracting = true;
             holdTime = 0f;
 
             activeInteractable.BeginInteract();
 
-            InteractionInfo info = activeInteractable.GetInteractionInfo(); //получаем инфу по структуре (тест,зажатие)
+            InteractionInfo info = activeInteractable.GetInteractionInfo();
 
             if (info.InteractionType == InteractionType.Press)
             {
@@ -59,13 +70,13 @@ public class InteractionController : MonoBehaviour
             }
         }
 
-        if (isInteracting && activeInteractable != null && inputReader.IsInteractHeld) //началось взаимодействие но E на Hold
+        if (isInteracting && activeInteractable != null && inputReader.IsInteractHeld)
         {
             holdTime += Time.deltaTime;
             activeInteractable.UpdateInteract(holdTime);
         }
 
-        if (isInteracting && activeInteractable != null && inputReader.InteractReleasedThisFrame) //проверка что кнопку отпустили в этом кадре
+        if (isInteracting && activeInteractable != null && inputReader.InteractReleasedThisFrame)
         {
             activeInteractable.EndInteract();
             ResetInteraction();
@@ -74,6 +85,19 @@ public class InteractionController : MonoBehaviour
 
     private void UpdatePrompt()
     {
+        // Во время осмотра prompt можно брать с предмета в осмотре
+        if (itemPickupController != null && itemPickupController.IsInspecting && itemPickupController.CurrentInspectingItem != null)
+        {
+            InteractionInfo inspectInfo = itemPickupController.CurrentInspectingItem.GetInteractionInfo();
+
+            if (inspectInfo.IsAvailable)
+            {
+                string inspectPrefix = inspectInfo.InteractionType == InteractionType.Hold ? "Hold E" : "E";
+                promptView.Show($"{inspectPrefix} — {inspectInfo.PromptText}");
+                return;
+            }
+        }
+
         if (currentInteractable == null)
         {
             promptView.Hide();
@@ -88,7 +112,7 @@ public class InteractionController : MonoBehaviour
             return;
         }
 
-        string prefix = info.InteractionType == InteractionType.Hold ? "Hold E" : "Press E";
+        string prefix = info.InteractionType == InteractionType.Hold ? "Hold E" : "E";
         promptView.Show($"{prefix} — {info.PromptText}");
     }
 
