@@ -53,7 +53,14 @@ public class ItemPickupController : MonoBehaviour
         // Во время осмотра коллайдер выключаем, чтобы он не мешал raycast
         item.SetColliderEnabled(false);
 
+        
+
         AttachToPoint(item.transform, inspectAnchor);
+
+        if (item.TryGetComponent(out NotePresentation note))
+        {
+            note.PlayOpen();
+        }
 
         inspectView.Show(item.Definition.description);
         SetPlayerControl(false);
@@ -97,6 +104,11 @@ public class ItemPickupController : MonoBehaviour
     private void PlaceHeldItem(ItemSocket socket)
     {
         ItemInteractable item = CurrentHeldItem;
+
+        if (item.TryGetComponent(out NotePresentation note))
+    {
+        note.ForceClosedState();
+    }
 
         CurrentHeldItem = null;
 

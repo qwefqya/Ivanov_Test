@@ -12,6 +12,8 @@ public class ItemInteractable : MonoBehaviour, IInteractable
     public ItemSocket HomeSocket => homeSocket;
     public ItemState State { get; private set; } = ItemState.InWorld;
 
+
+
     private void Awake()
     {
         pickupController = FindFirstObjectByType<ItemPickupController>();
