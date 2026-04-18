@@ -17,10 +17,16 @@ public class ItemSocket : MonoBehaviour, IInteractable
     public void SetItem(ItemInteractable item)
     {
         CurrentItem = item;
+
+        if (item != null)
+            item.SetCurrentSocket(this);
     }
 
     public void ClearItem()
     {
+        if (CurrentItem != null)
+            CurrentItem.SetCurrentSocket(null);
+
         CurrentItem = null;
     }
 

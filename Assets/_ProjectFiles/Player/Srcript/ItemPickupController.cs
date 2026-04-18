@@ -45,9 +45,9 @@ public class ItemPickupController : MonoBehaviour
         item.SetState(ItemState.Inspecting);
 
         // Если предмет лежал в сокете — очищаем сокет
-        if (item.HomeSocket != null && item.HomeSocket.CurrentItem == item)
+        if (item.CurrentSocket != null && item.CurrentSocket.CurrentItem == item)
         {
-            item.HomeSocket.ClearItem();
+            item.CurrentSocket.ClearItem();
         }
 
         // Во время осмотра коллайдер выключаем, чтобы он не мешал raycast
@@ -93,7 +93,7 @@ public class ItemPickupController : MonoBehaviour
         if (socket.CurrentItem != null)
             return false;
 
-        return CurrentHeldItem.HomeSocket == socket;
+        return true;
     }
 
     public void TryPlaceHeldItemIntoSocket(ItemSocket socket)

@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 4179587501312211770}
   - component: {fileID: 4077612270675931251}
   - component: {fileID: 3481779553771765909}
+  - component: {fileID: 7589185935136462010}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -350,6 +351,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   inputReader: {fileID: 4179587501312211770}
   promptView: {fileID: 0}
+  itemPickupController: {fileID: 0}
 --- !u!114 &3481779553771765909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,6 +369,20 @@ MonoBehaviour:
   inspectView: {fileID: 0}
   playerMovement: {fileID: 4926997732330436962}
   playerLook: {fileID: 888764416540788052}
+--- !u!114 &7589185935136462010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6568227012344761786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378d736f906e529468d9356408e19add, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemInspectRotator
+  itemPickupController: {fileID: 3481779553771765909}
+  rotationSpeed: 0.2
 --- !u!1 &7235369255700278499
 GameObject:
   m_ObjectHideFlags: 0

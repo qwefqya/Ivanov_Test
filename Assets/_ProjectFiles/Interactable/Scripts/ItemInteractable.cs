@@ -10,6 +10,7 @@ public class ItemInteractable : MonoBehaviour, IInteractable
 
     public ItemDefinition Definition => definition;
     public ItemSocket HomeSocket => homeSocket;
+    public ItemSocket CurrentSocket { get; private set; }
     public ItemState State { get; private set; } = ItemState.InWorld;
 
 
@@ -28,9 +29,14 @@ public class ItemInteractable : MonoBehaviour, IInteractable
         {
             State = ItemState.InSocket;
             homeSocket.SetItem(this);
+            CurrentSocket = homeSocket;
         }
     }
 
+    public void SetCurrentSocket(ItemSocket socket)
+    {
+        CurrentSocket = socket;
+    }
     public void SetState(ItemState state)
     {
         State = state;
