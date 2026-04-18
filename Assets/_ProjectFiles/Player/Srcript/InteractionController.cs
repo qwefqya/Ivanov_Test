@@ -11,6 +11,8 @@ public class InteractionController : MonoBehaviour
     private IInteractable currentInteractable;
     private IInteractable activeInteractable;
 
+    //нужно чтобы активность не сбивалась при отводе взгл€да
+
     private bool isInteracting;
     private float holdTime;
 
@@ -30,15 +32,16 @@ public class InteractionController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionLayer))
         {
             currentInteractable = hit.collider.GetComponent<IInteractable>();
-
+            // провер€ем на наличие интрфейса Interactctable
             if (currentInteractable == null)
                 currentInteractable = hit.collider.GetComponentInParent<IInteractable>();
+            //проверка наличи€ интрфейса у родител€
         }
     }
 
     private void ProcessInteraction()
     {
-        if (inputReader.InteractStartedThisFrame && currentInteractable != null)
+        if (inputReader.InteractStartedThisFrame && currentInteractable != null)  // провер€ем что смотрим на interactable и зажали E(action)
         {
             activeInteractable = currentInteractable;
             isInteracting = true;
@@ -46,7 +49,7 @@ public class InteractionController : MonoBehaviour
 
             activeInteractable.BeginInteract();
 
-            InteractionInfo info = activeInteractable.GetInteractionInfo();
+            InteractionInfo info = activeInteractable.GetInteractionInfo(); //получаем инфу по структуре (тест,зажатие)
 
             if (info.InteractionType == InteractionType.Press)
             {
@@ -56,13 +59,13 @@ public class InteractionController : MonoBehaviour
             }
         }
 
-        if (isInteracting && activeInteractable != null && inputReader.IsInteractHeld)
+        if (isInteracting && activeInteractable != null && inputReader.IsInteractHeld) //началось взаимодействие но E на Hold
         {
             holdTime += Time.deltaTime;
             activeInteractable.UpdateInteract(holdTime);
         }
 
-        if (isInteracting && activeInteractable != null && inputReader.InteractReleasedThisFrame)
+        if (isInteracting && activeInteractable != null && inputReader.InteractReleasedThisFrame) //проверка что кнопку отпустили в этом кадре
         {
             activeInteractable.EndInteract();
             ResetInteraction();
@@ -85,7 +88,7 @@ public class InteractionController : MonoBehaviour
             return;
         }
 
-        string prefix = info.InteractionType == InteractionType.Hold ? "Hold E" : "E";
+        string prefix = info.InteractionType == InteractionType.Hold ? "Hold E" : "Press E";
         promptView.Show($"{prefix} Ч {info.PromptText}");
     }
 

@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         moveAction.Disable();
-        moveAction.Dispose();
+       // moveAction.Dispose();
     }
 
     // Update is called once per frame

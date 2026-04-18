@@ -16,6 +16,10 @@ public class PlayerInputReader : MonoBehaviour
         interactAction.action.Enable();
     }
 
+    //подписываемся на action 
+
+
+
     private void OnDisable()
     {
         interactAction.action.started -= OnInteractStarted;
@@ -23,11 +27,15 @@ public class PlayerInputReader : MonoBehaviour
         interactAction.action.Disable();
     }
 
+    //отписка от action
+
     private void LateUpdate()
     {
         InteractStartedThisFrame = false;
         InteractReleasedThisFrame = false;
     }
+
+    // делает флаги одноразовыми для каждого кадра
 
     private void OnInteractStarted(InputAction.CallbackContext context)
     {
@@ -35,9 +43,13 @@ public class PlayerInputReader : MonoBehaviour
         InteractStartedThisFrame = true;
     }
 
+    //ставим кнопку нажатой в кадре
+
     private void OnInteractCanceled(InputAction.CallbackContext context)
     {
         IsInteractHeld = false;
         InteractReleasedThisFrame = true;
     }
+
+    //ставим кнопку не нажатой в кадре
 }

@@ -18,7 +18,7 @@ public class CameraController : MonoBehaviour
     private void OnDisable()
     {
         lookAction.Disable();
-        lookAction.Dispose();
+      //  lookAction.Dispose();
     }
 
     private void Start()
