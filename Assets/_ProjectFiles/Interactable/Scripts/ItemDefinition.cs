@@ -4,7 +4,8 @@ public enum ItemKind
 {
     Generic,
     Key,
-    Note
+    Note,
+    Decoder
 }
 
 public enum ItemState
