@@ -26,4 +26,6 @@ public class InteractionPromptView : MonoBehaviour
     }
 
     //функция скрытия текста
+
+
 }
