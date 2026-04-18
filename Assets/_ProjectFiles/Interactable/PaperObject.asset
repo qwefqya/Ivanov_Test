@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   itemId: paper
   displayName: "\u0417\u0430\u043F\u0438\u0441\u043A\u0430"
-  description: "\u0437\u0430\u043F\u0438\u0441\u043A\u0430"
+  description: 
   itemKind: 2

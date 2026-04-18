@@ -33,13 +33,7 @@ public class ItemSocket : MonoBehaviour, IInteractable
             return new InteractionInfo(false, "", InteractionType.Press);
 
         if (pickupController.CanPlaceIntoSocket(this))
-        {
-            bool isHomeSocket =
-                pickupController.CurrentHeldItem != null &&
-                pickupController.CurrentHeldItem.HomeSocket == this;
-
-            return new InteractionInfo(true, isHomeSocket ? "вернуть" : "положить", InteractionType.Press);
-        }
+            return new InteractionInfo(true, "положить", InteractionType.Press);
 
         return new InteractionInfo(false, "", InteractionType.Press);
     }

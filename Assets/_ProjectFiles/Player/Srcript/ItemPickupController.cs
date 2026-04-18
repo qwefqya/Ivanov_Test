@@ -90,7 +90,10 @@ public class ItemPickupController : MonoBehaviour
         if (socket == null)
             return false;
 
-        return true;
+        if (socket.CurrentItem != null)
+            return false;
+
+        return CurrentHeldItem.HomeSocket == socket;
     }
 
     public void TryPlaceHeldItemIntoSocket(ItemSocket socket)
@@ -135,5 +138,35 @@ public class ItemPickupController : MonoBehaviour
 
         if (playerLook != null)
             playerLook.enabled = enabled;
+    }
+
+    public bool IsHoldingItemKind(ItemKind kind)
+    {
+        if (CurrentHeldItem == null)
+            return false;
+
+        if (CurrentHeldItem.Definition == null)
+            return false;
+
+        return CurrentHeldItem.Definition.itemKind == kind;
+    }
+
+    public bool ConsumeHeldItemIfMatches(ItemKind kind)
+    {
+        if (!IsHoldingItemKind(kind))
+            return false;
+
+        ItemInteractable item = CurrentHeldItem;
+
+        CurrentHeldItem = null;
+        item.SetState(ItemState.Consumed);
+
+        if (item.TryGetComponent(out NotePresentation note))
+        {
+            note.ForceClosedState();
+        }
+
+        Destroy(item.gameObject);
+        return true;
     }
 }
