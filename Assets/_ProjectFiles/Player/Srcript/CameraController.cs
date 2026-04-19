@@ -17,23 +17,23 @@ public class CameraController : MonoBehaviour
     private void OnDisable()
     {
         lookAction.Disable();
-      //  lookAction.Dispose();
     }
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        rotationX = transform.localEulerAngles.x;
+
+        // Переводим угол из диапазона 0..360 в -180..180
+        if (rotationX > 180f)
+            rotationX -= 360f;
     }
 
     private void Update()
     {
         Vector2 mouseDelta = lookAction.ReadValue<Vector2>() * config.sensitivity;
-
-        // горизонтальный поворот (влево/вправо)
         transform.parent.Rotate(Vector3.up * mouseDelta.x);
-
-        // вертикальный поворот (вверх/вниз)
         rotationX -= mouseDelta.y;
         rotationX = Mathf.Clamp(rotationX, -config.maxAngle, config.maxAngle);
 

@@ -44,8 +44,7 @@ public class HackTerminalInteractable : BaseInteractable
 
     public override void BeginInteract()
     {
-        // Пусто.
-        // Реальный вход в hack mode делает InteractionController,
+        // вход в hack mode делает InteractionController,
         // когда видит этот объект и проверяет CanStartHack().
     }
 
