@@ -363,7 +363,7 @@ MonoBehaviour:
   interactionType: 0
   linkedDoor: {fileID: 716419627}
   itemPickupController: {fileID: 1616051914}
-  hackConfig: {fileID: 0}
+  hackConfig: {fileID: 11400000, guid: a67556554d71bc74e85511ab3ede7915, type: 2}
   requiredItemKind: 3
 --- !u!1 &174733625 stripped
 GameObject:
