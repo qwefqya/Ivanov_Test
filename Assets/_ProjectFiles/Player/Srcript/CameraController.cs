@@ -3,8 +3,7 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private float sensitivity = 0.1f;
-    [SerializeField] private float maxAngle = 75f;
+    [SerializeField] private PlayerConfig config;
 
     private float rotationX = 0f;
     private InputAction lookAction;
@@ -29,14 +28,14 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        Vector2 mouseDelta = lookAction.ReadValue<Vector2>() * sensitivity;
+        Vector2 mouseDelta = lookAction.ReadValue<Vector2>() * config.sensitivity;
 
         // горизонтальный поворот (влево/вправо)
         transform.parent.Rotate(Vector3.up * mouseDelta.x);
 
         // вертикальный поворот (вверх/вниз)
         rotationX -= mouseDelta.y;
-        rotationX = Mathf.Clamp(rotationX, -maxAngle, maxAngle);
+        rotationX = Mathf.Clamp(rotationX, -config.maxAngle, config.maxAngle);
 
         transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
     }
