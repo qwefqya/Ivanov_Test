@@ -9,7 +9,6 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TextMeshProUGUI speakerText;
     [SerializeField] private TextMeshProUGUI bodyText;
-    [SerializeField] private GameObject continueHint;
     [SerializeField] private Button[] choiceButtons;
 
     [Header("References")]
@@ -17,8 +16,6 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private CameraController playerLook;
     [SerializeField] private QuestController questController;
     [SerializeField] private List<ItemInteractable> sceneItems = new List<ItemInteractable>();
-
-    [SerializeField] private PlayerInputReader inputReader;
 
     private DialogueData currentDialogue;
     private NPCInteractable currentNpc;
@@ -35,22 +32,9 @@ public class DialogueController : MonoBehaviour
         HideChoices();
     }
 
-    private void Update()
-    {
-        if (!IsDialogueActive || currentDialogue == null)
-            return;
-
-        DialogueNode node = currentDialogue.nodes[currentNodeIndex];
-
-        if (node.choices.Count == 0 && inputReader != null && inputReader.InteractStartedThisFrame)
-        {
-            AdvanceLinearNode();
-        }
-    }
-
     public void StartDialogue(NPCInteractable npc, DialogueData dialogue, bool isQuestNpc)
     {
-        if (dialogue == null || dialogue.nodes.Count == 0)
+        if (dialogue == null || dialogue.nodes == null || dialogue.nodes.Count == 0)
             return;
 
         currentNpc = npc;
@@ -59,6 +43,7 @@ public class DialogueController : MonoBehaviour
         currentNpcIsQuestNpc = isQuestNpc;
 
         IsDialogueActive = true;
+
         SetPlayerControl(false);
         SetCursorState(true);
 
@@ -73,7 +58,19 @@ public class DialogueController : MonoBehaviour
         if (currentDialogue == null)
             return;
 
+        if (currentNodeIndex < 0 || currentNodeIndex >= currentDialogue.nodes.Count)
+        {
+            EndDialogue();
+            return;
+        }
+
         DialogueNode node = currentDialogue.nodes[currentNodeIndex];
+
+        // Выдача квеста срабатывает при показе этого узла один раз
+        if (node.givesQuest && currentNpcIsQuestNpc && questController != null && !questController.HasActiveQuest)
+        {
+            questController.StartRandomItemQuest(sceneItems);
+        }
 
         if (speakerText != null)
             speakerText.text = node.speakerName;
@@ -81,54 +78,13 @@ public class DialogueController : MonoBehaviour
         if (bodyText != null)
             bodyText.text = node.text;
 
-        if (node.choices.Count > 0)
+        if (node.choices != null && node.choices.Count > 0)
         {
             ShowChoices(node.choices);
-            if (continueHint != null)
-                continueHint.SetActive(false);
         }
         else
         {
             HideChoices();
-
-            if (continueHint != null)
-                continueHint.SetActive(!node.isEnding);
-        }
-    }
-
-    private void AdvanceLinearNode()
-    {
-        DialogueNode node = currentDialogue.nodes[currentNodeIndex];
-
-        if (node.isEnding)
-        {
-            EndDialogue();
-            return;
-        }
-
-        // Для линейного диалога без choices переходим просто на следующий индекс
-        int nextIndex = currentNodeIndex + 1;
-
-        if (nextIndex >= currentDialogue.nodes.Count)
-        {
-            // Финал диалога
-            if (node.givesQuest && currentNpcIsQuestNpc && questController != null && !questController.HasActiveQuest)
-            {
-                questController.StartRandomItemQuest(sceneItems);
-            }
-
-            EndDialogue();
-            return;
-        }
-
-        currentNodeIndex = nextIndex;
-        ShowCurrentNode();
-
-        DialogueNode newNode = currentDialogue.nodes[currentNodeIndex];
-
-        if (newNode.givesQuest && currentNpcIsQuestNpc && questController != null && !questController.HasActiveQuest)
-        {
-            questController.StartRandomItemQuest(sceneItems);
         }
     }
 
@@ -139,6 +95,10 @@ public class DialogueController : MonoBehaviour
         for (int i = 0; i < choiceButtons.Length && i < choices.Count; i++)
         {
             int capturedIndex = i;
+
+            if (choiceButtons[i] == null)
+                continue;
+
             choiceButtons[i].gameObject.SetActive(true);
 
             TextMeshProUGUI label = choiceButtons[i].GetComponentInChildren<TextMeshProUGUI>();
@@ -152,7 +112,10 @@ public class DialogueController : MonoBehaviour
 
     private void HideChoices()
     {
-        foreach (var button in choiceButtons)
+        if (choiceButtons == null)
+            return;
+
+        foreach (Button button in choiceButtons)
         {
             if (button == null)
                 continue;
@@ -167,7 +130,14 @@ public class DialogueController : MonoBehaviour
         if (currentDialogue == null)
             return;
 
-        if (choice.nextNodeIndex < 0 || choice.nextNodeIndex >= currentDialogue.nodes.Count)
+        // Любой отрицательный индекс = закончить диалог
+        if (choice.nextNodeIndex < 0)
+        {
+            EndDialogue();
+            return;
+        }
+
+        if (choice.nextNodeIndex >= currentDialogue.nodes.Count)
         {
             EndDialogue();
             return;
@@ -180,6 +150,7 @@ public class DialogueController : MonoBehaviour
     public void EndDialogue()
     {
         IsDialogueActive = false;
+
         currentDialogue = null;
         currentNpc = null;
         currentNodeIndex = 0;

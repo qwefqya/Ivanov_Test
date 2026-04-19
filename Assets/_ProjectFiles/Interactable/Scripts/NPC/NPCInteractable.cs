@@ -31,6 +31,7 @@ public class NPCInteractable : MonoBehaviour, IInteractable
         if (dialogueController == null || dialogueData == null)
             return;
 
+        // Если уже есть активный квест и он ещё не выполнен — пробуем сдать предмет
         if (isQuestNpc && questController != null && questController.HasActiveQuest && !questController.IsQuestCompleted)
         {
             questController.TryCompleteQuest();
