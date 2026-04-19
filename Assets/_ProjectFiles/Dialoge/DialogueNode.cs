@@ -1,16 +1,13 @@
-using UnityEngine;
+using System;
+using System.Collections.Generic;
 
-public class DialogueNode : MonoBehaviour
+[Serializable]
+public class DialogueNode
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public string speakerName;
+    public string text;
+    public List<DialogueChoice> choices = new List<DialogueChoice>();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public bool isEnding = false;
+    public bool givesQuest = false;
 }

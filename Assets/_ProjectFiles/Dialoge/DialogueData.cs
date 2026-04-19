@@ -1,16 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class DialogueData : MonoBehaviour
+[CreateAssetMenu(menuName = "Game/Dialogue Data")]
+public class DialogueData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public List<DialogueNode> nodes = new List<DialogueNode>();
+    public int startNodeIndex = 0;
 }

@@ -171,4 +171,27 @@ public class ItemPickupController : MonoBehaviour
         Destroy(item.gameObject);
         return true;
     }
+
+    public ItemInteractable GetHeldItem()
+    {
+        return CurrentHeldItem;
+    }
+
+    public void ConsumeHeldItem()
+    {
+        if (CurrentHeldItem == null)
+            return;
+
+        ItemInteractable item = CurrentHeldItem;
+        CurrentHeldItem = null;
+
+        item.SetState(ItemState.Consumed);
+
+        if (item.TryGetComponent(out NotePresentation note))
+        {
+            note.ForceClosedState();
+        }
+
+        Destroy(item.gameObject);
+    }
 }
