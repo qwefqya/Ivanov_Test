@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NPCInteractable : MonoBehaviour, IInteractable
+public class NPCInteractable : BaseInteractable
 {
     [SerializeField] private string npcName = "NPC";
     [SerializeField] private DialogueData dialogueData;
@@ -11,27 +11,23 @@ public class NPCInteractable : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        promptText = "разговор";
+        interactionType = InteractionType.Press;
+
         dialogueController = FindFirstObjectByType<DialogueController>();
         questController = FindFirstObjectByType<QuestController>();
     }
 
-    public InteractionInfo GetInteractionInfo()
+    protected override bool CanInteract()
     {
-        if (dialogueController == null)
-            return new InteractionInfo(false, "", InteractionType.Press);
-
-        if (dialogueController.IsDialogueActive)
-            return new InteractionInfo(false, "", InteractionType.Press);
-
-        return new InteractionInfo(true, "разговор", InteractionType.Press);
+        return dialogueController != null && !dialogueController.IsDialogueActive;
     }
 
-    public void BeginInteract()
+    public override void BeginInteract()
     {
         if (dialogueController == null || dialogueData == null)
             return;
 
-        // Если уже есть активный квест и он ещё не выполнен — пробуем сдать предмет
         if (isQuestNpc && questController != null && questController.HasActiveQuest && !questController.IsQuestCompleted)
         {
             questController.TryCompleteQuest();
@@ -39,9 +35,6 @@ public class NPCInteractable : MonoBehaviour, IInteractable
 
         dialogueController.StartDialogue(this, dialogueData, isQuestNpc);
     }
-
-    public void UpdateInteract(float holdTime) { }
-    public void EndInteract() { }
 
     public string NpcName => npcName;
 }

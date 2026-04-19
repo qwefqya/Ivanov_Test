@@ -1,19 +1,21 @@
 using UnityEngine;
 
-public class ChestInteractable : MonoBehaviour, IInteractable
+public class ChestInteractable : BaseInteractable
 {
     [SerializeField] private Animator animator;
     [SerializeField] private string openTrigger = "Open";
+    [SerializeField] private ItemKind requiredItemKind = ItemKind.Key;
 
     private ItemPickupController itemPickupController;
     private bool isOpened;
 
     private void Awake()
     {
+        interactionType = InteractionType.Press;
         itemPickupController = FindFirstObjectByType<ItemPickupController>();
     }
 
-    public InteractionInfo GetInteractionInfo()
+    public override InteractionInfo GetInteractionInfo()
     {
         if (isOpened)
             return new InteractionInfo(false, "", InteractionType.Press);
@@ -21,40 +23,28 @@ public class ChestInteractable : MonoBehaviour, IInteractable
         if (itemPickupController == null)
             return new InteractionInfo(false, "", InteractionType.Press);
 
-        if (itemPickupController.IsHoldingItemKind(ItemKind.Key))
+        if (itemPickupController.IsHoldingItemKind(requiredItemKind))
             return new InteractionInfo(true, "открыть", InteractionType.Press);
 
         return new InteractionInfo(true, "нужен ключ", InteractionType.Press);
     }
 
-    public void BeginInteract()
+    public override void BeginInteract()
     {
-        if (isOpened)
+        if (isOpened || itemPickupController == null)
             return;
 
-        if (itemPickupController == null)
-            return;
+        bool consumed = itemPickupController.ConsumeHeldItemIfMatches(requiredItemKind);
 
-        bool keyConsumed = itemPickupController.ConsumeHeldItemIfMatches(ItemKind.Key);
-
-        if (!keyConsumed)
+        if (!consumed)
             return;
 
         OpenChest();
     }
 
-    public void UpdateInteract(float holdTime)
-    {
-    }
-
-    public void EndInteract()
-    {
-    }
-
     private void OpenChest()
     {
         isOpened = true;
-       // Debug.Log(isOpened);
 
         if (animator != null)
             animator.SetTrigger(openTrigger);

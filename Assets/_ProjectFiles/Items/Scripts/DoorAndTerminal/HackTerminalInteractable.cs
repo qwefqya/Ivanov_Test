@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HackTerminalInteractable : MonoBehaviour, IInteractable
+public class HackTerminalInteractable : BaseInteractable
 {
     [SerializeField] private AutoVerticalDoor linkedDoor;
     [SerializeField] private ItemPickupController itemPickupController;
@@ -21,17 +21,14 @@ public class HackTerminalInteractable : MonoBehaviour, IInteractable
     public IReadOnlyList<HackSignal> RequiredSequence => parsedSequence;
     public int MaxMistakes => maxMistakes;
 
-    
-
     private void Awake()
     {
-        if (itemPickupController == null)
-            itemPickupController = FindFirstObjectByType<ItemPickupController>();
-
+        interactionType = InteractionType.Press;
+        itemPickupController ??= FindFirstObjectByType<ItemPickupController>();
         parsedSequence = HackCodeUtility.ParseSequence(encodedSequence);
     }
 
-    public InteractionInfo GetInteractionInfo()
+    public override InteractionInfo GetInteractionInfo()
     {
         if (isSolved)
             return new InteractionInfo(false, "", InteractionType.Press);
@@ -45,13 +42,17 @@ public class HackTerminalInteractable : MonoBehaviour, IInteractable
         return new InteractionInfo(true, "взломать", InteractionType.Press);
     }
 
-    public void BeginInteract()
+    protected override bool CanInteract()
     {
-        // Запуск режима теперь делает InteractionController
+        return !isSolved;
     }
 
-    public void UpdateInteract(float holdTime) { }
-    public void EndInteract() { }
+    public override void BeginInteract()
+    {
+        // Пусто.
+        // Реальный вход в hack mode делает InteractionController,
+        // когда видит этот объект и проверяет CanStartHack().
+    }
 
     public bool CanStartHack()
     {

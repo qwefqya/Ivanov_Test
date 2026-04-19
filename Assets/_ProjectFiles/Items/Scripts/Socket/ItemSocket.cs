@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemSocket : MonoBehaviour, IInteractable
+public class ItemSocket : BaseInteractable
 {
     [SerializeField] private Transform itemPoint;
 
@@ -11,6 +11,9 @@ public class ItemSocket : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        promptText = "положить";
+        interactionType = InteractionType.Press;
+
         pickupController = FindFirstObjectByType<ItemPickupController>();
     }
 
@@ -30,7 +33,7 @@ public class ItemSocket : MonoBehaviour, IInteractable
         CurrentItem = null;
     }
 
-    public InteractionInfo GetInteractionInfo()
+    public override InteractionInfo GetInteractionInfo()
     {
         if (pickupController == null)
             return new InteractionInfo(false, "", InteractionType.Press);
@@ -44,14 +47,11 @@ public class ItemSocket : MonoBehaviour, IInteractable
         return new InteractionInfo(false, "", InteractionType.Press);
     }
 
-    public void BeginInteract()
+    public override void BeginInteract()
     {
         if (pickupController == null)
             return;
 
         pickupController.TryPlaceHeldItemIntoSocket(this);
     }
-
-    public void UpdateInteract(float holdTime) { }
-    public void EndInteract() { }
 }

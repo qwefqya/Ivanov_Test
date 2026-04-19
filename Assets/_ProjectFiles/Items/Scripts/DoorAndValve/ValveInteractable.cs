@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine;
 
-public class ValveInteractable : MonoBehaviour, IInteractable
+public class ValveInteractable : BaseInteractable
 {
     [Header("Valve")]
     [SerializeField] private Transform valveHandle;
@@ -14,11 +13,13 @@ public class ValveInteractable : MonoBehaviour, IInteractable
 
     private float currentAngle = 0f;
     private bool isBeingHeld = false;
-
     private Quaternion initialLocalRotation;
 
     private void Awake()
     {
+        promptText = "крутить";
+        interactionType = InteractionType.Hold;
+
         if (valveHandle == null)
             valveHandle = transform;
 
@@ -36,17 +37,12 @@ public class ValveInteractable : MonoBehaviour, IInteractable
         }
     }
 
-    public InteractionInfo GetInteractionInfo()
-    {
-        return new InteractionInfo(true, "крутить", InteractionType.Hold);
-    }
-
-    public void BeginInteract()
+    public override void BeginInteract()
     {
         isBeingHeld = true;
     }
 
-    public void UpdateInteract(float holdTime)
+    public override void UpdateInteract(float holdTime)
     {
         currentAngle += rotateSpeed * Time.deltaTime;
         currentAngle = Mathf.Min(currentAngle, maxRotationAngle);
@@ -54,7 +50,7 @@ public class ValveInteractable : MonoBehaviour, IInteractable
         ApplyRotationAndDoorProgress();
     }
 
-    public void EndInteract()
+    public override void EndInteract()
     {
         isBeingHeld = false;
     }
