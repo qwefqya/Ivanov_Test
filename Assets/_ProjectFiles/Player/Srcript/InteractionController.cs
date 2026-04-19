@@ -1,14 +1,35 @@
+using System.Collections.Generic;
 using UnityEngine;
+
+public enum HackSignal
+{
+    Short,
+    Long
+}
 
 public class InteractionController : MonoBehaviour
 {
+    private enum InteractionMode
+    {
+        World,
+        InspectItem,
+        HackSequence
+    }
+
+    [Header("World Interaction")]
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float interactionDistance = 3f;
     [SerializeField] private LayerMask interactionLayer;
+
+    [Header("References")]
     [SerializeField] private PlayerInputReader inputReader;
     [SerializeField] private InteractionPromptView promptView;
     [SerializeField] private ItemPickupController itemPickupController;
-    [SerializeField] private HackSequenceController hackSequenceController;
+    [SerializeField] private PlayerController playerMovement;
+    [SerializeField] private CameraController playerLook;
+
+    [Header("Hack Settings")]
+    [SerializeField] private float longPressThreshold = 0.5f;
 
     private IInteractable currentInteractable;
     private IInteractable activeInteractable;
@@ -16,17 +37,102 @@ public class InteractionController : MonoBehaviour
     private bool isInteracting;
     private float holdTime;
 
+    private InteractionMode currentMode = InteractionMode.World;
+
+    // Hack mode state
+    private HackTerminalInteractable activeHackTerminal;
+    private float currentHackPressTime = 0f;
+    private int currentHackStep = 0;
+    private bool waitForHackRelease = false;
+
     private void Update()
     {
-        if (hackSequenceController != null && hackSequenceController.IsHacking)
-            return;
+        switch (currentMode)
+        {
+            case InteractionMode.World:
+                UpdateWorldMode();
+                break;
 
+            case InteractionMode.InspectItem:
+                UpdateInspectMode();
+                break;
+
+            case InteractionMode.HackSequence:
+                UpdateHackMode();
+                break;
+        }
+    }
+
+    private void UpdateWorldMode()
+    {
         UpdateCurrentInteractable();
-        ProcessInteraction();
-        UpdatePrompt();
-        UpdateCurrentInteractable();
-        ProcessInteraction();
-        UpdatePrompt();
+        ProcessWorldInteraction();
+        UpdateWorldPrompt();
+
+        if (itemPickupController != null && itemPickupController.IsInspecting)
+        {
+            currentMode = InteractionMode.InspectItem;
+        }
+    }
+
+    private void UpdateInspectMode()
+    {
+        UpdateInspectPrompt();
+
+        if (inputReader != null && inputReader.InteractStartedThisFrame)
+        {
+            ItemInteractable inspectingItem = itemPickupController != null
+                ? itemPickupController.CurrentInspectingItem
+                : null;
+
+            if (inspectingItem != null)
+            {
+                inspectingItem.BeginInteract();
+            }
+        }
+
+        if (itemPickupController == null || !itemPickupController.IsInspecting)
+        {
+            currentMode = InteractionMode.World;
+        }
+    }
+
+    private void UpdateHackMode()
+    {
+        if (activeHackTerminal == null || inputReader == null)
+        {
+            ExitHackMode();
+            return;
+        }
+
+        UpdateHackPrompt();
+
+        // »гнорируем отпускание стартового E, которым вошли в режим
+        if (waitForHackRelease)
+        {
+            if (inputReader.InteractReleasedThisFrame)
+            {
+                waitForHackRelease = false;
+                currentHackPressTime = 0f;
+            }
+
+            return;
+        }
+
+        if (inputReader.IsInteractHeld)
+        {
+            currentHackPressTime += Time.deltaTime;
+        }
+
+        if (inputReader.InteractReleasedThisFrame)
+        {
+            HackSignal signal = currentHackPressTime >= longPressThreshold
+                ? HackSignal.Long
+                : HackSignal.Short;
+
+            currentHackPressTime = 0f;
+            SubmitHackSignal(signal);
+        }
     }
 
     private void UpdateCurrentInteractable()
@@ -44,32 +150,34 @@ public class InteractionController : MonoBehaviour
         }
     }
 
-    private void ProcessInteraction()
+    private void ProcessWorldInteraction()
     {
-        IInteractable target = null;
+        if (inputReader == null)
+            return;
 
-        // ≈сли сейчас идЄт осмотр предмета, второй E должен работать
-        // не через raycast, а через текущий предмет в осмотре
-        if (itemPickupController != null && itemPickupController.IsInspecting)
+        if (inputReader.InteractStartedThisFrame && currentInteractable != null)
         {
-            target = itemPickupController.CurrentInspectingItem;
-        }
-        else
-        {
-            target = currentInteractable;
-        }
+            // ≈сли это терминал взлома, запускаем специальный режим
+            if (currentInteractable is HackTerminalInteractable hackTerminal)
+            {
+                InteractionInfo info = hackTerminal.GetInteractionInfo();
 
-        if (inputReader.InteractStartedThisFrame && target != null)
-        {
-            activeInteractable = target;
+                if (info.IsAvailable && hackTerminal.CanStartHack())
+                {
+                    EnterHackMode(hackTerminal);
+                    return;
+                }
+            }
+
+            activeInteractable = currentInteractable;
             isInteracting = true;
             holdTime = 0f;
 
             activeInteractable.BeginInteract();
 
-            InteractionInfo info = activeInteractable.GetInteractionInfo();
+            InteractionInfo interactionInfo = activeInteractable.GetInteractionInfo();
 
-            if (info.InteractionType == InteractionType.Press)
+            if (interactionInfo.InteractionType == InteractionType.Press)
             {
                 activeInteractable.EndInteract();
                 ResetInteraction();
@@ -90,21 +198,8 @@ public class InteractionController : MonoBehaviour
         }
     }
 
-    private void UpdatePrompt()
+    private void UpdateWorldPrompt()
     {
-        // ¬о врем€ осмотра prompt можно брать с предмета в осмотре
-        if (itemPickupController != null && itemPickupController.IsInspecting && itemPickupController.CurrentInspectingItem != null)
-        {
-            InteractionInfo inspectInfo = itemPickupController.CurrentInspectingItem.GetInteractionInfo();
-
-            if (inspectInfo.IsAvailable)
-            {
-                string inspectPrefix = inspectInfo.InteractionType == InteractionType.Hold ? "Hold E" : "E";
-                promptView.Show($"{inspectPrefix} Ч {inspectInfo.PromptText}");
-                return;
-            }
-        }
-
         if (currentInteractable == null)
         {
             promptView.Hide();
@@ -123,10 +218,111 @@ public class InteractionController : MonoBehaviour
         promptView.Show($"{prefix} Ч {info.PromptText}");
     }
 
+    private void UpdateInspectPrompt()
+    {
+        if (itemPickupController == null || itemPickupController.CurrentInspectingItem == null)
+        {
+            promptView.Hide();
+            return;
+        }
+
+        InteractionInfo info = itemPickupController.CurrentInspectingItem.GetInteractionInfo();
+
+        if (!info.IsAvailable)
+        {
+            promptView.Hide();
+            return;
+        }
+
+        promptView.Show($"E Ч {info.PromptText}");
+    }
+
+    private void EnterHackMode(HackTerminalInteractable terminal)
+    {
+        activeHackTerminal = terminal;
+        currentHackStep = 0;
+        currentHackPressTime = 0f;
+        waitForHackRelease = true;
+
+        currentMode = InteractionMode.HackSequence;
+
+        SetPlayerControl(false);
+        UpdateHackPrompt();
+    }
+
+    private void ExitHackMode()
+    {
+        activeHackTerminal = null;
+        currentHackStep = 0;
+        currentHackPressTime = 0f;
+        waitForHackRelease = false;
+
+        currentMode = InteractionMode.World;
+
+        SetPlayerControl(true);
+        promptView.Hide();
+    }
+
+    private void SubmitHackSignal(HackSignal signal)
+    {
+        if (activeHackTerminal == null)
+        {
+            ExitHackMode();
+            return;
+        }
+
+        IReadOnlyList<HackSignal> sequence = activeHackTerminal.RequiredSequence;
+
+        if (sequence == null || sequence.Count == 0)
+        {
+            ExitHackMode();
+            return;
+        }
+
+        if (signal != sequence[currentHackStep])
+        {
+            currentHackStep = 0;
+            UpdateHackPrompt();
+            return;
+        }
+
+        currentHackStep++;
+
+        if (currentHackStep >= sequence.Count)
+        {
+            activeHackTerminal.OnHackSuccess();
+            ExitHackMode();
+        }
+        else
+        {
+            UpdateHackPrompt();
+        }
+    }
+
+    private void UpdateHackPrompt()
+    {
+        if (activeHackTerminal == null)
+        {
+            promptView.Hide();
+            return;
+        }
+
+        promptView.Show($"E Ч ввод кода [{activeHackTerminal.GetSequenceProgressText(currentHackStep)}]");
+    }
+
     private void ResetInteraction()
     {
         isInteracting = false;
         activeInteractable = null;
         holdTime = 0f;
+    }
+
+    private void SetPlayerControl(bool enabled)
+    {
+        if (playerMovement != null)
+            playerMovement.enabled = enabled;
+
+        if (playerLook != null)
+            playerLook.enabled = enabled;
     }
 }

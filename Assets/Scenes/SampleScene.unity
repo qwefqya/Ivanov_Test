@@ -355,10 +355,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HackTerminalInteractable
   linkedDoor: {fileID: 716419627}
-  hackController: {fileID: 1616051916}
   itemPickupController: {fileID: 1616051914}
-  requiredSequence: 01000000000000000000000001000000
   requiredItemKind: 3
+  requiredSequence: 01000000000000000000000001000000
 --- !u!1001 &252923803
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2180,6 +2179,10 @@ MonoBehaviour:
   playerLook: {fileID: 330585548}
   promptView: {fileID: 937510798}
   longPressThreshold: 0.5
+  activeTerminal: {fileID: 0}
+  isHacking: 0
+  currentPressTime: 0
+  currentStep: 0
 --- !u!1 &1844895191
 GameObject:
   m_ObjectHideFlags: 0
@@ -2946,9 +2949,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 722567720}
     - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
+      propertyPath: playerLook
+      value: 
+      objectReference: {fileID: 330585548}
+    - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: promptView
       value: 
       objectReference: {fileID: 937510798}
+    - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
+      propertyPath: playerMovement
+      value: 
+      objectReference: {fileID: 1616051911}
     - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: itemPickupController
       value: 
