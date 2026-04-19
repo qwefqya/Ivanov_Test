@@ -60,6 +60,7 @@ public class DialogueController : MonoBehaviour
 
         IsDialogueActive = true;
         SetPlayerControl(false);
+        SetCursorState(true);
 
         if (dialoguePanel != null)
             dialoguePanel.SetActive(true);
@@ -189,6 +190,7 @@ public class DialogueController : MonoBehaviour
 
         HideChoices();
         SetPlayerControl(true);
+        SetCursorState(false);
     }
 
     private void SetPlayerControl(bool enabled)
@@ -198,5 +200,19 @@ public class DialogueController : MonoBehaviour
 
         if (playerLook != null)
             playerLook.enabled = enabled;
+    }
+
+    private void SetCursorState(bool dialogueActive)
+    {
+        if (dialogueActive)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 }
