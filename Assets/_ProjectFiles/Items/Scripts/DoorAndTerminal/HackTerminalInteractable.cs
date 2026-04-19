@@ -5,27 +5,22 @@ public class HackTerminalInteractable : BaseInteractable
 {
     [SerializeField] private AutoVerticalDoor linkedDoor;
     [SerializeField] private ItemPickupController itemPickupController;
+    [SerializeField] private HackConfig hackConfig;
 
     [Header("Hack Requirements")]
     [SerializeField] private ItemKind requiredItemKind = ItemKind.Decoder;
-
-    [Header("Sequence")]
-    [SerializeField] private string encodedSequence = "1001";
-
-    [Header("Failure")]
-    [SerializeField] private int maxMistakes = 3;
 
     private bool isSolved = false;
     private List<HackSignal> parsedSequence = new List<HackSignal>();
 
     public IReadOnlyList<HackSignal> RequiredSequence => parsedSequence;
-    public int MaxMistakes => maxMistakes;
+    public int MaxMistakes => hackConfig.maxMistakes;
 
     private void Awake()
     {
         interactionType = InteractionType.Press;
         itemPickupController ??= FindFirstObjectByType<ItemPickupController>();
-        parsedSequence = HackCodeUtility.ParseSequence(encodedSequence);
+        parsedSequence = HackCodeUtility.ParseSequence(hackConfig.encodedSequence);
     }
 
     public override InteractionInfo GetInteractionInfo()
@@ -80,11 +75,11 @@ public class HackTerminalInteractable : BaseInteractable
 
     public string GetEncodedSequence()
     {
-        return encodedSequence;
+        return hackConfig.encodedSequence;
     }
 
     public string GetDisplaySequence()
     {
-        return HackCodeUtility.ToSymbolString(encodedSequence, true);
+        return HackCodeUtility.ToSymbolString(hackConfig.encodedSequence, true);
     }
 }

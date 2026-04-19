@@ -4,9 +4,7 @@ public class ValveInteractable : BaseInteractable
 {
     [Header("Valve")]
     [SerializeField] private Transform valveHandle;
-    [SerializeField] private float maxRotationAngle = 180f;
-    [SerializeField] private float rotateSpeed = 120f;
-    [SerializeField] private float returnSpeed = 90f;
+    [SerializeField] private ValveConfig config;
 
     [Header("Door")]
     [SerializeField] private VerticalDoorByProgress linkedDoor;
@@ -30,7 +28,7 @@ public class ValveInteractable : BaseInteractable
     {
         if (!isBeingHeld && currentAngle > 0f)
         {
-            currentAngle -= returnSpeed * Time.deltaTime;
+            currentAngle -= config.returnSpeed * Time.deltaTime;
             currentAngle = Mathf.Max(currentAngle, 0f);
 
             ApplyRotationAndDoorProgress();
@@ -44,8 +42,8 @@ public class ValveInteractable : BaseInteractable
 
     public override void UpdateInteract(float holdTime)
     {
-        currentAngle += rotateSpeed * Time.deltaTime;
-        currentAngle = Mathf.Min(currentAngle, maxRotationAngle);
+        currentAngle += config.rotateSpeed * Time.deltaTime;
+        currentAngle = Mathf.Min(currentAngle, config.maxRotationAngle);
 
         ApplyRotationAndDoorProgress();
     }
@@ -59,7 +57,7 @@ public class ValveInteractable : BaseInteractable
     {
         valveHandle.localRotation = initialLocalRotation * Quaternion.Euler(0f, 0f, -currentAngle);
 
-        float progress = currentAngle / maxRotationAngle;
+        float progress = currentAngle / config.maxRotationAngle;
 
         if (linkedDoor != null)
             linkedDoor.SetOpenProgress(progress);

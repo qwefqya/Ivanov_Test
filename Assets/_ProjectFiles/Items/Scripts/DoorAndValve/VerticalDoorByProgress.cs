@@ -3,7 +3,7 @@ using UnityEngine;
 public class VerticalDoorByProgress : MonoBehaviour
 {
     [SerializeField] private Transform doorTransform;
-    [SerializeField] private float openHeight = 3f;
+    [SerializeField] private ValveConfig config;
 
     private Vector3 closedLocalPosition;
 
@@ -19,7 +19,7 @@ public class VerticalDoorByProgress : MonoBehaviour
     {
         progress = Mathf.Clamp01(progress);
 
-        Vector3 targetPosition = closedLocalPosition + Vector3.up * openHeight * progress;
+        Vector3 targetPosition = closedLocalPosition + Vector3.up * config.openHeight * progress;
         doorTransform.localPosition = targetPosition;
     }
 }

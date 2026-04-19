@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
 
-    [SerializeField] private float moveSpeed = 1.0f;
+    [SerializeField] private PlayerConfig config;
 
     private CharacterController characterController;
     private InputAction moveAction;
@@ -42,6 +42,6 @@ public class PlayerController : MonoBehaviour
 
         Vector3 moveDirection = transform.forward * input.y + transform.right * input.x;
 
-        characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
+        characterController.Move(moveDirection * config.moveSpeed * Time.deltaTime);
     }
 }

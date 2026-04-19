@@ -359,11 +359,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b65d9f7f5c1eac5478a6daeecd1ce9d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HackTerminalInteractable
+  promptText: 
+  interactionType: 0
   linkedDoor: {fileID: 716419627}
   itemPickupController: {fileID: 1616051914}
+  hackConfig: {fileID: 0}
   requiredItemKind: 3
-  encodedSequence: 10010
-  maxMistakes: 3
 --- !u!1 &174733625 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3403942657344202688, guid: 5c0e01a6c99317749aea5aa9670ba76e, type: 3}
@@ -1839,17 +1840,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2018710a70c3f24e8105e3d90c2c7be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSocket
---- !u!1 &1616051906 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6568227012344761786, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
-  m_PrefabInstance: {fileID: 7261497401468668392}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1616051911 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4926997732330436962, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
   m_PrefabInstance: {fileID: 7261497401468668392}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1616051906}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ced1e4222dd5adf4ba0552f0a5d0e6fb, type: 3}
@@ -1860,24 +1856,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3481779553771765909, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
   m_PrefabInstance: {fileID: 7261497401468668392}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1616051906}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa95b9c1d18421f4e83b2c83b1b042fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPickupController
---- !u!114 &1616051916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1616051906}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07be99585ec70594d8c8ca7e90767c36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HackSequenceController
 --- !u!114 &1882315326 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7796230177372941175, guid: 0a883c5664f2ed043af09f8f4c9f194d, type: 3}
@@ -2143,6 +2127,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7796230177372941175, guid: 0a883c5664f2ed043af09f8f4c9f194d, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 02e353432a318114ba2dafe8ce284f15, type: 2}
     - target: {fileID: 8522463492477653970, guid: 0a883c5664f2ed043af09f8f4c9f194d, type: 3}
       propertyPath: m_Name
       value: Door from valve
@@ -2175,6 +2163,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door with terminal
       objectReference: {fileID: 0}
+    - target: {fileID: 4127634089494829761, guid: d1340f74689d2cc489e837f767f11371, type: 3}
+      propertyPath: hackConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: a67556554d71bc74e85511ab3ede7915, type: 2}
     - target: {fileID: 5687084588244225095, guid: d1340f74689d2cc489e837f767f11371, type: 3}
       propertyPath: m_LocalPosition.x
       value: -19.255566
@@ -2268,6 +2260,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4187981615928701775, guid: ffd207ff8dff4d143b0721085f5b6629, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 02e353432a318114ba2dafe8ce284f15, type: 2}
     - target: {fileID: 4187981615928701775, guid: ffd207ff8dff4d143b0721085f5b6629, type: 3}
       propertyPath: linkedDoor
       value: 
@@ -2867,6 +2863,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 722567720}
     - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
+      propertyPath: hackConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: a67556554d71bc74e85511ab3ede7915, type: 2}
+    - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: playerLook
       value: 
       objectReference: {fileID: 330585548}
@@ -2874,6 +2874,10 @@ PrefabInstance:
       propertyPath: promptView
       value: 
       objectReference: {fileID: 937510798}
+    - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
+      propertyPath: playerConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 38eb235de85790d408f60d1f5a679fb7, type: 2}
     - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: playerMovement
       value: 
@@ -2885,7 +2889,11 @@ PrefabInstance:
     - target: {fileID: 4077612270675931251, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: hackSequenceController
       value: 
-      objectReference: {fileID: 1616051916}
+      objectReference: {fileID: 0}
+    - target: {fileID: 4926997732330436962, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 38eb235de85790d408f60d1f5a679fb7, type: 2}
     - target: {fileID: 6568227012344761786, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2918,10 +2926,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 606709986580134299, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6568227012344761786, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1616051916}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cafe2dd7734904b429a502ae14436a6c, type: 3}
 --- !u!1001 &8037111195822859492
 PrefabInstance:

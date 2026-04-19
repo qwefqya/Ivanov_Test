@@ -3,8 +3,7 @@ using UnityEngine;
 public class AutoVerticalDoor : MonoBehaviour
 {
     [SerializeField] private Transform doorTransform;
-    [SerializeField] private float openHeight = 3f;
-    [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private HackConfig hackConfig;
 
     private Vector3 closedLocalPosition;
     private Vector3 openedLocalPosition;
@@ -16,7 +15,7 @@ public class AutoVerticalDoor : MonoBehaviour
             doorTransform = transform;
 
         closedLocalPosition = doorTransform.localPosition;
-        openedLocalPosition = closedLocalPosition + Vector3.up * openHeight;
+        openedLocalPosition = closedLocalPosition + Vector3.up * hackConfig.openHeight;
     }
 
     private void Update()
@@ -25,7 +24,7 @@ public class AutoVerticalDoor : MonoBehaviour
         doorTransform.localPosition = Vector3.MoveTowards(
             doorTransform.localPosition,
             target,
-            moveSpeed * Time.deltaTime
+            hackConfig.moveSpeed * Time.deltaTime
         );
     }
 

@@ -18,8 +18,7 @@ public class InteractionController : MonoBehaviour
 
     [Header("World Interaction")]
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private float interactionDistance = 3f;
-    [SerializeField] private LayerMask interactionLayer;
+   
 
     [Header("References")]
     [SerializeField] private PlayerInputReader inputReader;
@@ -28,8 +27,8 @@ public class InteractionController : MonoBehaviour
     [SerializeField] private PlayerController playerMovement;
     [SerializeField] private CameraController playerLook;
 
-    [Header("Hack Settings")]
-    [SerializeField] private float longPressThreshold = 0.5f;
+    [SerializeField] private HackConfig hackConfig;
+    [SerializeField] private PlayerConfig playerConfig;
 
     private IInteractable currentInteractable;
     private IInteractable activeInteractable;
@@ -124,7 +123,7 @@ public class InteractionController : MonoBehaviour
 
         if (inputReader.InteractReleasedThisFrame)
         {
-            HackSignal signal = currentHackPressTime >= longPressThreshold
+            HackSignal signal = currentHackPressTime >= hackConfig.longPressThreshold
                 ? HackSignal.Long
                 : HackSignal.Short;
 
@@ -139,7 +138,7 @@ public class InteractionController : MonoBehaviour
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, playerConfig.interactionDistance, playerConfig.interactionLayer))
         {
             currentInteractable = hit.collider.GetComponent<IInteractable>();
 
