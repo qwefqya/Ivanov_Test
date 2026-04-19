@@ -9,24 +9,26 @@ public class HackTerminalInteractable : MonoBehaviour, IInteractable
     [Header("Hack Requirements")]
     [SerializeField] private ItemKind requiredItemKind = ItemKind.Decoder;
 
-    [Header("Required Sequence")]
-    [SerializeField]
-    private List<HackSignal> requiredSequence = new List<HackSignal>
-    {
-        HackSignal.Long,
-        HackSignal.Short,
-        HackSignal.Short,
-        HackSignal.Long
-    };
+    [Header("Sequence")]
+    [SerializeField] private string encodedSequence = "1001";
+
+    [Header("Failure")]
+    [SerializeField] private int maxMistakes = 3;
 
     private bool isSolved = false;
+    private List<HackSignal> parsedSequence = new List<HackSignal>();
 
-    public IReadOnlyList<HackSignal> RequiredSequence => requiredSequence;
+    public IReadOnlyList<HackSignal> RequiredSequence => parsedSequence;
+    public int MaxMistakes => maxMistakes;
+
+    
 
     private void Awake()
     {
         if (itemPickupController == null)
             itemPickupController = FindFirstObjectByType<ItemPickupController>();
+
+        parsedSequence = HackCodeUtility.ParseSequence(encodedSequence);
     }
 
     public InteractionInfo GetInteractionInfo()
@@ -45,17 +47,11 @@ public class HackTerminalInteractable : MonoBehaviour, IInteractable
 
     public void BeginInteract()
     {
-        // Ничего не делаем здесь.
-        // Запуск режима взлома теперь контролирует InteractionController.
+        // Запуск режима теперь делает InteractionController
     }
 
-    public void UpdateInteract(float holdTime)
-    {
-    }
-
-    public void EndInteract()
-    {
-    }
+    public void UpdateInteract(float holdTime) { }
+    public void EndInteract() { }
 
     public bool CanStartHack()
     {
@@ -78,20 +74,16 @@ public class HackTerminalInteractable : MonoBehaviour, IInteractable
 
     public string GetSequenceProgressText(int completedSteps)
     {
-        string result = "";
+        return HackCodeUtility.ProgressString(parsedSequence, completedSteps);
+    }
 
-        for (int i = 0; i < requiredSequence.Count; i++)
-        {
-            if (i < completedSteps)
-            {
-                result += requiredSequence[i] == HackSignal.Long ? "— " : "• ";
-            }
-            else
-            {
-                result += "_ ";
-            }
-        }
+    public string GetEncodedSequence()
+    {
+        return encodedSequence;
+    }
 
-        return result.TrimEnd();
+    public string GetDisplaySequence()
+    {
+        return HackCodeUtility.ToSymbolString(encodedSequence, true);
     }
 }

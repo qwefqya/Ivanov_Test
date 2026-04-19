@@ -39,11 +39,12 @@ public class InteractionController : MonoBehaviour
 
     private InteractionMode currentMode = InteractionMode.World;
 
-    // Hack mode state
+    // Hack mode
     private HackTerminalInteractable activeHackTerminal;
     private float currentHackPressTime = 0f;
     private int currentHackStep = 0;
     private bool waitForHackRelease = false;
+    private int currentHackMistakes = 0;
 
     private void Update()
     {
@@ -86,9 +87,7 @@ public class InteractionController : MonoBehaviour
                 : null;
 
             if (inspectingItem != null)
-            {
                 inspectingItem.BeginInteract();
-            }
         }
 
         if (itemPickupController == null || !itemPickupController.IsInspecting)
@@ -107,7 +106,6 @@ public class InteractionController : MonoBehaviour
 
         UpdateHackPrompt();
 
-        // »гнорируем отпускание стартового E, которым вошли в режим
         if (waitForHackRelease)
         {
             if (inputReader.InteractReleasedThisFrame)
@@ -157,7 +155,6 @@ public class InteractionController : MonoBehaviour
 
         if (inputReader.InteractStartedThisFrame && currentInteractable != null)
         {
-            // ≈сли это терминал взлома, запускаем специальный режим
             if (currentInteractable is HackTerminalInteractable hackTerminal)
             {
                 InteractionInfo info = hackTerminal.GetInteractionInfo();
@@ -242,6 +239,7 @@ public class InteractionController : MonoBehaviour
         activeHackTerminal = terminal;
         currentHackStep = 0;
         currentHackPressTime = 0f;
+        currentHackMistakes = 0;
         waitForHackRelease = true;
 
         currentMode = InteractionMode.HackSequence;
@@ -255,6 +253,7 @@ public class InteractionController : MonoBehaviour
         activeHackTerminal = null;
         currentHackStep = 0;
         currentHackPressTime = 0f;
+        currentHackMistakes = 0;
         waitForHackRelease = false;
 
         currentMode = InteractionMode.World;
@@ -281,7 +280,15 @@ public class InteractionController : MonoBehaviour
 
         if (signal != sequence[currentHackStep])
         {
+            currentHackMistakes++;
             currentHackStep = 0;
+
+            if (currentHackMistakes >= activeHackTerminal.MaxMistakes)
+            {
+                ExitHackMode();
+                return;
+            }
+
             UpdateHackPrompt();
             return;
         }
@@ -307,7 +314,9 @@ public class InteractionController : MonoBehaviour
             return;
         }
 
-        promptView.Show($"E Ч ввод кода [{activeHackTerminal.GetSequenceProgressText(currentHackStep)}]");
+        promptView.Show(
+            $"E Ч ввод кода [{activeHackTerminal.GetSequenceProgressText(currentHackStep)}] ќшибки: {currentHackMistakes}/{activeHackTerminal.MaxMistakes}"
+        );
     }
 
     private void ResetInteraction()
